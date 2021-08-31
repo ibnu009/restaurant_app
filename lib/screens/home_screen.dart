@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/models/restaurant.dart';
 import 'package:flutter/services.dart' as rootBundle;
+import 'package:restaurant_app/screens/detail_restaurant_screen.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -18,8 +19,8 @@ class HomeScreen extends StatelessWidget {
             if (snapshot.hasError) {
               return Center(child: Text("${snapshot.error}"));
             } else if (snapshot.hasData) {
-              var items = snapshot.data as List<Restaurant>;
-              if (items.isEmpty) {
+              var restaurants = snapshot.data as List<Restaurant>;
+              if (restaurants.isEmpty) {
                 return Center(
                   child: Text("Empty"),
                 );
@@ -30,10 +31,17 @@ class HomeScreen extends StatelessWidget {
                     childAspectRatio: 7.5 / 10,
                     mainAxisSpacing: 12,
                   ),
-                  itemCount: items.length,
+                  itemCount: restaurants.length,
                   itemBuilder: (context, index) {
-                    print(items[index].image);
-                    return restaurantItem(context, items[index]);
+                    print(restaurants[index].image);
+                    return InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, DetailRestaurantScreen.routeName,
+                            arguments: restaurants[index]);
+                      },
+                      child: restaurantItem(context, restaurants[index]),
+                    );
                   },
                 );
               }
