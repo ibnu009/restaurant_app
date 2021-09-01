@@ -3,14 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/models/restaurant.dart';
 
 Widget restaurantItem(BuildContext context, Restaurant restaurant) {
-  final responsiveHeight = MediaQuery.of(context).size.height * 0.15;
-  final responsiveWidth = MediaQuery.of(context).size.width * 0.45;
   return ClipRRect(
     borderRadius: BorderRadius.all(Radius.circular(25)),
     child: Container(
       margin: EdgeInsets.symmetric(horizontal: 8),
-      width: responsiveWidth,
-      height: responsiveHeight,
       color: Colors.white,
       child: Stack(
         children: [
@@ -18,7 +14,7 @@ Widget restaurantItem(BuildContext context, Restaurant restaurant) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 200,
+                height: 150,
                 child: Image.network(
                   restaurant.image,
                   fit: BoxFit.cover,
@@ -28,6 +24,9 @@ Widget restaurantItem(BuildContext context, Restaurant restaurant) {
                 padding:
                     const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16),
                 child: Text(restaurant.name,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
                     style: TextStyle(
                         color: Colors.black87,
                         fontSize: 18,

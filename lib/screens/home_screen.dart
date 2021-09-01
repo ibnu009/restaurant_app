@@ -26,9 +26,10 @@ class HomeScreen extends StatelessWidget {
                 );
               } else {
                 return GridView.builder(
+                  shrinkWrap: true,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 230,
-                    childAspectRatio: 7.5 / 10,
+                    childAspectRatio: 3.5 / 4,
                     mainAxisSpacing: 12,
                   ),
                   itemCount: restaurants.length,

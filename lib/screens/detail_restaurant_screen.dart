@@ -15,6 +15,15 @@ class DetailRestaurantScreen extends StatelessWidget {
     final screen = MediaQuery.of(context).size;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlue,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: Text(restaurant.name),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +134,7 @@ class DetailRestaurantScreen extends StatelessWidget {
                               assetImage: FOOD_PLACE_HOLDER),
                         );
                       },
-                      child: MenuItem(
+                      child: menuItem(
                           context: context,
                           name: restaurant.menu.foods[index].name,
                           type: FOOD_TYPE),
@@ -162,7 +171,7 @@ class DetailRestaurantScreen extends StatelessWidget {
                               assetImage: DRINK_PLACE_HOLDER),
                         );
                       },
-                      child: MenuItem(
+                      child: menuItem(
                           context: context,
                           name: restaurant.menu.drinks[index].name,
                           type: DRINK_TYPE),

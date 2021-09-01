@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/utils/const_value.dart';
 
-Widget MenuItem(
+Widget menuItem(
     {required BuildContext context,
     required String name,
     required String type}) {
