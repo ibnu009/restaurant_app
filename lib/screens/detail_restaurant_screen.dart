@@ -1,190 +1,247 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
-import 'package:restaurant_app/models/restaurant.dart';
+import 'package:restaurant_app/provider/favorite_module_provider.dart';
+import 'package:restaurant_app/source/data/models/restaurant.dart';
+import 'package:restaurant_app/source/network/responses/detail_restaurant_response.dart';
+import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
 import 'package:restaurant_app/utils/const_value.dart';
 import 'package:restaurant_app/widgets/menu_item.dart';
 
-class DetailRestaurantScreen extends StatelessWidget {
+class DetailRestaurantScreen extends StatefulWidget {
   static const routeName = '/detailRestaurant';
-  final Restaurant restaurant;
+  final String idRestaurant;
 
-  DetailRestaurantScreen({required this.restaurant});
+  DetailRestaurantScreen({required this.idRestaurant});
+
+  @override
+  _DetailRestaurantScreenState createState() => _DetailRestaurantScreenState();
+}
+
+class _DetailRestaurantScreenState extends State<DetailRestaurantScreen> {
+  late Future<DetailRestaurantResponse> _futureDetailRestaurant;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureDetailRestaurant =
+        RestaurantNetworkService().fetchRestaurantDetail(widget.idRestaurant);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: Text(restaurant.name),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: screen.height * 0.4,
-              child: Stack(
-                children: [
-                  Container(
-                      height: screen.height * 0.4,
-                      width: screen.width * 1,
-                      child:
-                          Image.network(restaurant.image, fit: BoxFit.cover)),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16),
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      height: 54,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                offset: Offset(0, 5),
-                                blurRadius: 20,
-                                color: Colors.black12)
-                          ]),
-                      child: Row(
-                        children: [
-                          Text(
-                            restaurant.rating.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black54),
-                          ),
-                          Icon(Icons.star, color: Colors.yellow),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return Hero(
+      tag: widget.idRestaurant,
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.lightBlue,
+            leading: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(Icons.arrow_back, color: Colors.white),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0, left: 16),
-              child: Text(
-                restaurant.name,
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 12),
-              child: Row(
-                children: [
-                  Icon(Icons.place, color: Colors.redAccent),
-                  Text(
-                    restaurant.city,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700, color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0, left: 16),
-              child: ReadMoreText(
-                restaurant.description,
-                trimLines: 3,
-                trimMode: TrimMode.Line,
-                trimCollapsedText: 'Show more',
-                trimExpandedText: 'Show less',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black45),
-              ),
-            ),
-            // Foods
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0, left: 16),
-              child: Text(
-                'Menu Makanan',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: SizedBox(
-                height: screen.height * 0.175,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: restaurant.menu.foods.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (_) => imageDialog(
-                              name: restaurant.menu.foods[index].name,
-                              assetImage: FOOD_PLACE_HOLDER),
-                        );
-                      },
-                      child: menuItem(
-                          context: context,
-                          name: restaurant.menu.foods[index].name,
-                          type: FOOD_TYPE),
-                    );
-                  },
-                ),
-              ),
-            ),
-            // drinks
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0, left: 16),
-              child: Text(
-                'Menu Minuman',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: SizedBox(
-                height: screen.height * 0.175,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: restaurant.menu.drinks.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (_) => imageDialog(
-                              name: restaurant.menu.drinks[index].name,
-                              assetImage: DRINK_PLACE_HOLDER),
-                        );
-                      },
-                      child: menuItem(
-                          context: context,
-                          name: restaurant.menu.drinks[index].name,
-                          type: DRINK_TYPE),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+          body: FutureBuilder(
+            future: _futureDetailRestaurant,
+            builder: (context, snapshot) {
+              var state = snapshot.connectionState;
+              switch (state) {
+                case ConnectionState.waiting:
+                  return Center(child: CircularProgressIndicator());
+                case ConnectionState.done:
+                  if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Center(child: Text("${snapshot.error}"));
+                  } else if (snapshot.hasData) {
+                    var data = snapshot.data as DetailRestaurantResponse;
+                    return _detailRestaurantBody(context, data.restaurant);
+                  } else {
+                    return Text('');
+                  }
+                default:
+                  return Text('');
+              }
+            },
+          )),
     );
   }
+}
+
+Widget _detailRestaurantBody(BuildContext context, Restaurant restaurant) {
+  final screen = MediaQuery.of(context).size;
+
+  return SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: screen.height * 0.4,
+          child: Container(
+              height: screen.height * 0.4,
+              width: screen.width * 1,
+              child: Image.network("$PICTURE_URL_LARGE${restaurant.pictureId}",
+                  fit: BoxFit.cover)),
+        ),
+        Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 18.0, left: 16),
+                  child: Text(
+                    restaurant.name,
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.place, color: Colors.redAccent),
+                      Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Text(
+                          restaurant.city,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black54),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Icon(Icons.star, color: Colors.yellow),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Text(
+                          restaurant.rating.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black54),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
+            Consumer<FavoriteModuleProvider>(
+                builder: (context, FavoriteModuleProvider provider, _) {
+              bool isFavorite =
+                  provider.favoritedRestaurants.contains(restaurant.id);
+              return Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: IconButton(
+                  onPressed: () {
+                    if (isFavorite) {
+                      provider.removeFromFavorite(restaurant.id);
+                    } else {
+                      provider.addToFavorite(restaurant.id);
+                    }
+                  },
+                  icon: isFavorite
+                      ? Icon(
+                          Icons.favorite,
+                          color: Colors.redAccent,
+                        )
+                      : Icon(Icons.favorite_border),
+                ),
+              );
+            })
+          ],
+        ),
+
+        Padding(
+          padding: const EdgeInsets.only(top: 4.0, left: 16),
+          child: ReadMoreText(
+            restaurant.description,
+            trimLines: 3,
+            trimMode: TrimMode.Line,
+            trimCollapsedText: 'Show more',
+            trimExpandedText: 'Show less',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                color: Colors.black45),
+          ),
+        ),
+        // Foods
+        Padding(
+          padding: const EdgeInsets.only(top: 18.0, left: 16),
+          child: Text(
+            'Menu Makanan',
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: SizedBox(
+            height: screen.height * 0.175,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: restaurant.menus.foods.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () async {
+                    await showDialog(
+                      context: context,
+                      builder: (_) => imageDialog(
+                          name: restaurant.menus.foods[index].name,
+                          assetImage: FOOD_PLACE_HOLDER),
+                    );
+                  },
+                  child: menuItem(
+                      context: context,
+                      name: restaurant.menus.foods[index].name,
+                      type: FOOD_TYPE),
+                );
+              },
+            ),
+          ),
+        ),
+        // drinks
+        Padding(
+          padding: const EdgeInsets.only(top: 18.0, left: 16),
+          child: Text(
+            'menus Minuman',
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: SizedBox(
+            height: screen.height * 0.175,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: restaurant.menus.drinks.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () async {
+                    await showDialog(
+                      context: context,
+                      builder: (_) => imageDialog(
+                          name: restaurant.menus.drinks[index].name,
+                          assetImage: DRINK_PLACE_HOLDER),
+                    );
+                  },
+                  child: menuItem(
+                      context: context,
+                      name: restaurant.menus.drinks[index].name,
+                      type: DRINK_TYPE),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 Widget imageDialog({required String name, required String assetImage}) {

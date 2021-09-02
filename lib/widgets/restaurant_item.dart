@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/models/restaurant.dart';
+import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
+import 'package:restaurant_app/utils/const_value.dart';
 
-Widget restaurantItem(BuildContext context, Restaurant restaurant) {
+Widget restaurantItem(
+    {required RestaurantForList restaurant,
+    required bool isFavorited,
+    required Function() onFavoriteClick}) {
   return ClipRRect(
     borderRadius: BorderRadius.all(Radius.circular(25)),
     child: Container(
@@ -16,28 +20,51 @@ Widget restaurantItem(BuildContext context, Restaurant restaurant) {
               SizedBox(
                 height: 150,
                 child: Image.network(
-                  restaurant.image,
+                  "$PICTURE_URL_SMALL${restaurant.pictureId}",
                   fit: BoxFit.cover,
                 ),
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16),
-                child: Text(restaurant.name,
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600)),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16),
-                child: Text(
-                  restaurant.city,
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
+                child: Container(
+                  height: 55,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        flex: 2,
+                        child: RichText(
+                          overflow: TextOverflow.fade,
+                          text: TextSpan(children: [
+                            TextSpan(
+                              text: "${restaurant.name}\n",
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            TextSpan(
+                              text: restaurant.city,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ]),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: IconButton(
+                            onPressed: onFavoriteClick,
+                            icon: Icon(
+                              isFavorited
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color:
+                                  isFavorited ? Colors.redAccent : Colors.grey,
+                            )),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],
