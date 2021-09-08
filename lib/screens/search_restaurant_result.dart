@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/provider/favorite_module_provider.dart';
@@ -5,18 +6,37 @@ import 'package:restaurant_app/screens/detail_restaurant_screen.dart';
 import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
 import 'package:restaurant_app/source/network/responses/restaurant_search_response.dart';
 import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
+import 'package:restaurant_app/utils/connection_supervisor.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
-class SearchRestaurantResult extends StatelessWidget {
+class SearchRestaurantResult extends StatefulWidget {
   static const routeName = '/searchRestaurant';
 
   final String keyword;
   SearchRestaurantResult({required this.keyword});
 
   @override
+  _SearchRestaurantResultState createState() => _SearchRestaurantResultState();
+}
+
+class _SearchRestaurantResultState extends State<SearchRestaurantResult> {
+  Map _source = {ConnectivityResult.none: false};
+
+  final ConnectionSupervisor _connection = ConnectionSupervisor.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _connection.init();
+    _connection.myStream.listen((event) {
+      setState(() => _source = event);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Future<RestaurantSearchResponse> _futureSearchedRestaurants =
-        RestaurantNetworkService().fetchSearchedRestaurants(keyword);
+        RestaurantNetworkService().fetchSearchedRestaurants(widget.keyword);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,16 +68,32 @@ class SearchRestaurantResult extends StatelessWidget {
     );
   }
 
+  @override
+  void dispose() {
+    _connection.disposeConnectionStream();
+    super.dispose();
+  }
+
   Widget _searchRestaurantBody(AsyncSnapshot<Object?> snapshot) {
     if (snapshot.hasError) {
-      print(snapshot.error);
-      return Center(child: Text("${snapshot.error}"));
+      if (_source.keys.toList()[0] == ConnectivityResult.none) {
+        print(snapshot.error);
+        return Center(
+          child: Text(
+            "Tidak ada koneksi Internet, periksa kembali sambungan internet Anda!",
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else {
+        print(snapshot.error);
+        return Center(child: Text("Terjadi Kesalahan"));
+      }
     } else if (snapshot.hasData) {
       var data = snapshot.data as RestaurantSearchResponse;
 
       if (data.restaurants.isEmpty) {
         return Center(
-          child: Text("Empty"),
+          child: Text("Restaurant yang anda cari tidak ditemukan!"),
         );
       } else {
         return GridView.builder(

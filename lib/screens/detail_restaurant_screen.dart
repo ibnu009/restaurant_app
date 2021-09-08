@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -5,6 +6,7 @@ import 'package:restaurant_app/provider/favorite_module_provider.dart';
 import 'package:restaurant_app/source/data/models/restaurant.dart';
 import 'package:restaurant_app/source/network/responses/detail_restaurant_response.dart';
 import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
+import 'package:restaurant_app/utils/connection_supervisor.dart';
 import 'package:restaurant_app/utils/const_value.dart';
 import 'package:restaurant_app/widgets/menu_item.dart';
 
@@ -21,9 +23,16 @@ class DetailRestaurantScreen extends StatefulWidget {
 class _DetailRestaurantScreenState extends State<DetailRestaurantScreen> {
   late Future<DetailRestaurantResponse> _futureDetailRestaurant;
 
+  Map _source = {ConnectivityResult.none: false};
+  final ConnectionSupervisor _connection = ConnectionSupervisor.instance;
+
   @override
   void initState() {
     super.initState();
+    _connection.init();
+    _connection.myStream.listen((event) {
+      setState(() => _source = event);
+    });
     _futureDetailRestaurant =
         RestaurantNetworkService().fetchRestaurantDetail(widget.idRestaurant);
   }
@@ -49,8 +58,18 @@ class _DetailRestaurantScreenState extends State<DetailRestaurantScreen> {
                   return Center(child: CircularProgressIndicator());
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    print(snapshot.error);
-                    return Center(child: Text("${snapshot.error}"));
+                    if (_source.keys.toList()[0] == ConnectivityResult.none) {
+                      print(snapshot.error);
+                      return Center(
+                        child: Text(
+                          "Tidak ada koneksi Internet, periksa kembali sambungan internet Anda!",
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    } else {
+                      print(snapshot.error);
+                      return Center(child: Text("Terjadi Kesalahan"));
+                    }
                   } else if (snapshot.hasData) {
                     var data = snapshot.data as DetailRestaurantResponse;
                     return _detailRestaurantBody(context, data.restaurant);
@@ -63,6 +82,12 @@ class _DetailRestaurantScreenState extends State<DetailRestaurantScreen> {
             },
           )),
     );
+  }
+
+  @override
+  void dispose() {
+    _connection.disposeConnectionStream();
+    super.dispose();
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/provider/favorite_module_provider.dart';
@@ -6,6 +7,7 @@ import 'package:restaurant_app/screens/search_restaurant_result.dart';
 import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
 import 'package:restaurant_app/source/network/responses/restaurant_response.dart';
 import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
+import 'package:restaurant_app/utils/connection_supervisor.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Map _source = {ConnectivityResult.none: false};
+  final ConnectionSupervisor _connection = ConnectionSupervisor.instance;
   late Future<RestaurantResponse> _futureRestaurants;
 
   final TextEditingController _searchController = TextEditingController();
@@ -28,6 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _connection.init();
+    _connection.myStream.listen((event) {
+      setState(() => _source = event);
+    });
     _futureRestaurants = RestaurantNetworkService().fetchRestaurants();
   }
 
@@ -60,6 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screen = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: _appBarTitle,
@@ -77,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               case ConnectionState.waiting:
                 return CircularProgressIndicator();
               case ConnectionState.done:
-                return _homeScreenBody(snapshot);
+                return _homeScreenBody(snapshot, screen);
               default:
                 return Text('');
             }
@@ -87,10 +97,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _homeScreenBody(AsyncSnapshot<Object?> snapshot) {
+  Widget _homeScreenBody(AsyncSnapshot<Object?> snapshot, Size screen) {
     if (snapshot.hasError) {
-      print(snapshot.error);
-      return Center(child: Text("${snapshot.error}"));
+      if (_source.keys.toList()[0] == ConnectivityResult.none) {
+        print(snapshot.error);
+        return Center(
+          child: Text(
+            "Tidak ada koneksi Internet, periksa kembali sambungan internet Anda!",
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else {
+        print(snapshot.error);
+        return Center(child: Text("Terjadi Kesalahan"));
+      }
     } else if (snapshot.hasData) {
       var data = snapshot.data as RestaurantResponse;
 
@@ -103,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 230,
-            childAspectRatio: 3.5 / 4,
+            childAspectRatio: screen.width / screen.height * 1.4,
             mainAxisSpacing: 12,
           ),
           itemCount: data.restaurants.length,
@@ -143,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _connection.disposeConnectionStream();
     _searchController.dispose();
     super.dispose();
   }
