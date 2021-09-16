@@ -1,7 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/provider/favorite_module_provider.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/screens/detail_restaurant_screen.dart';
 import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
 import 'package:restaurant_app/source/network/responses/restaurant_search_response.dart';
@@ -106,26 +106,18 @@ class _SearchRestaurantResultState extends State<SearchRestaurantResult> {
           itemCount: data.restaurants.length,
           itemBuilder: (context, index) {
             RestaurantForList restaurant = data.restaurants[index];
-
             return InkWell(
               onTap: () {
                 Navigator.pushNamed(context, DetailRestaurantScreen.routeName,
                     arguments: data.restaurants[index].id);
               },
-              child: Consumer<FavoriteModuleProvider>(
-                builder: (context, FavoriteModuleProvider provider, widget) {
-                  bool isFavorite =
-                      provider.favoritedRestaurants.contains(restaurant.id);
+              child: Consumer<DatabaseProvider>(
+                builder: (context, provider, widget) {
                   return Hero(
                     tag: restaurant.id,
                     child: restaurantItem(
-                        restaurant: restaurant,
-                        isFavorited: isFavorite,
-                        onFavoriteClick: () {
-                          isFavorite
-                              ? provider.removeFromFavorite(restaurant.id)
-                              : provider.addToFavorite(restaurant.id);
-                        }),
+                      restaurant: restaurant,
+                    ),
                   );
                 },
               ),

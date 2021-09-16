@@ -2,8 +2,10 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/favorite_module_provider.dart';
 import 'package:restaurant_app/source/data/models/restaurant.dart';
+import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
 import 'package:restaurant_app/source/network/responses/detail_restaurant_response.dart';
 import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
 import 'package:restaurant_app/utils/connection_supervisor.dart';
@@ -154,27 +156,37 @@ Widget _detailRestaurantBody(BuildContext context, Restaurant restaurant) {
               ],
             ),
             Spacer(),
-            Consumer<FavoriteModuleProvider>(
-                builder: (context, FavoriteModuleProvider provider, _) {
-              bool isFavorite =
-                  provider.favoritedRestaurants.contains(restaurant.id);
-              return Padding(
-                padding: const EdgeInsets.only(right: 12.0),
-                child: IconButton(
-                  onPressed: () {
-                    if (isFavorite) {
-                      provider.removeFromFavorite(restaurant.id);
-                    } else {
-                      provider.addToFavorite(restaurant.id);
-                    }
-                  },
-                  icon: isFavorite
-                      ? Icon(
-                          Icons.favorite,
-                          color: Colors.redAccent,
-                        )
-                      : Icon(Icons.favorite_border),
-                ),
+            Consumer<DatabaseProvider>(builder: (context, provider, _) {
+              return FutureBuilder<bool>(
+                future: provider.isRestaurantFavorited(restaurant.id),
+                builder: (context, snapshot) {
+                  var isFavorite = snapshot.data ?? false;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: IconButton(
+                      onPressed: () {
+                        if (isFavorite) {
+                          provider.removeFromFavoriteRestaurant(restaurant.id);
+                        } else {
+                          var restaurantForList = RestaurantForList(
+                              id: restaurant.id,
+                              name: restaurant.name,
+                              description: restaurant.description,
+                              pictureId: restaurant.pictureId,
+                              city: restaurant.city,
+                              rating: restaurant.rating);
+                          provider.addToFavoriteRestaurant(restaurantForList);
+                        }
+                      },
+                      icon: isFavorite
+                          ? Icon(
+                              Icons.favorite,
+                              color: Colors.redAccent,
+                            )
+                          : Icon(Icons.favorite_border),
+                    ),
+                  );
+                },
               );
             })
           ],
