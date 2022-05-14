@@ -58,7 +58,6 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         title: _appBarTitle,
@@ -106,10 +105,9 @@ Widget _homeScreenBody(AsyncSnapshot<Object?> snapshot, Size screen) {
     } else {
       return GridView.builder(
         shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 230,
-          childAspectRatio: screen.width / screen.height * 1.4,
-          mainAxisSpacing: 12,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisExtent: 280,
         ),
         itemCount: data.restaurants.length,
         itemBuilder: (_, index) {
@@ -123,8 +121,11 @@ Widget _homeScreenBody(AsyncSnapshot<Object?> snapshot, Size screen) {
                 },
                 child: Hero(
                   tag: restaurant.id,
-                  child: restaurantItem(
-                    restaurant: restaurant,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: restaurantItem(
+                      restaurant: restaurant,
+                    ),
                   ),
                 ),
               );

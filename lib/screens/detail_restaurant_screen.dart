@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:restaurant_app/provider/database_provider.dart';
-import 'package:restaurant_app/provider/favorite_module_provider.dart';
 import 'package:restaurant_app/source/data/models/restaurant.dart';
 import 'package:restaurant_app/source/data/models/restaurant_for_list.dart';
 import 'package:restaurant_app/source/network/responses/detail_restaurant_response.dart';
@@ -74,7 +73,7 @@ class _DetailRestaurantScreenState extends State<DetailRestaurantScreen> {
                     }
                   } else if (snapshot.hasData) {
                     var data = snapshot.data as DetailRestaurantResponse;
-                    return _detailRestaurantBody(context, data.restaurant);
+                    return _detailRestaurantBody(context, data.restaurant!);
                   } else {
                     return Text('');
                   }

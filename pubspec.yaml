@@ -21,19 +21,19 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  android_alarm_manager: ^2.0.0
+  android_alarm_manager_plus: ^2.0.3
   connectivity: ^3.0.6
   cupertino_icons: ^1.0.3
   flutter:
     sdk: flutter
-  flutter_local_notifications: ^5.0.0
-  flutter_svg: ^0.22.0
+  flutter_local_notifications:
+  flutter_svg: ^1.0.3
   http: ^0.13.3
   intl: ^0.17.0
   json_annotation: null
   provider: ^6.0.0
   readmore: null
-  rxdart: ^0.26.0
+  rxdart: ^0.27.3
   shared_preferences: ^2.0.5
   sqflite: ^2.0.0+4
 

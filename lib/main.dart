@@ -1,8 +1,9 @@
-import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/provider/database_provider.dart';
+import 'package:restaurant_app/provider/network_provider.dart';
 import 'package:restaurant_app/provider/notification_provider.dart';
 import 'package:restaurant_app/provider/preferences_provider.dart';
 import 'package:restaurant_app/screens/detail_restaurant_screen.dart';
@@ -10,6 +11,7 @@ import 'package:restaurant_app/screens/home_screen.dart';
 import 'package:restaurant_app/screens/search_restaurant_result.dart';
 import 'package:restaurant_app/source/data/preferences/preferences_helper.dart';
 import 'package:restaurant_app/source/local/database_helper.dart';
+import 'package:restaurant_app/source/network/services/restaurant_network_service.dart';
 import 'package:restaurant_app/utils/background_service.dart';
 import 'package:restaurant_app/utils/notification_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,6 +39,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => DatabaseProvider(
             databaseHelper: DatabaseHelper(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NetworkProvider(
+            networkService: RestaurantNetworkService(),
           ),
         ),
         ChangeNotifierProvider(

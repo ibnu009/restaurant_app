@@ -11,7 +11,10 @@ class DateTimeHelper {
     // Today Format
     final todayDate = dateFormat.format(now);
     final todayDateAndTime = "$todayDate $timeSpecific";
+    print("date is $todayDateAndTime");
     var resultToday = completeFormat.parseStrict(todayDateAndTime);
+    print("result is $resultToday");
+
 
     // Tomorrow Format
     var formatted = resultToday.add(Duration(days: 1));
@@ -19,6 +22,7 @@ class DateTimeHelper {
     final tomorrowDateAndTime = "$tomorrowDate $timeSpecific";
     var resultTomorrow = completeFormat.parseStrict(tomorrowDateAndTime);
 
+    print("is result past today ${now.isAfter(resultToday)}");
     return now.isAfter(resultToday) ? resultTomorrow : resultToday;
   }
 }

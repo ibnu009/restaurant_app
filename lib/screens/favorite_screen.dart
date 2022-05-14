@@ -15,12 +15,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Hasil Pencarian'),
+          title: Text('Favorite'),
           centerTitle: true,
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-          ),
         ),
         backgroundColor: Color.fromARGB(250, 250, 250, 250),
         body: _buildListFavorite());

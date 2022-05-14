@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restaurant_app/common/navigation.dart';
@@ -41,7 +42,8 @@ class NotificationHelper {
     var _channelDescription = "Restaurant Info";
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        _channelId, _channelName, _channelDescription,
+        _channelId, _channelName,
+        channelDescription: _channelDescription,
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker',
@@ -51,7 +53,8 @@ class NotificationHelper {
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
     var titleNotification = "<b>Headline News</b>";
-    var titleNews = restaurant.restaurants[0].name;
+    var rand = Random().nextInt(20);
+    var titleNews = restaurant.restaurants[rand].name;
 
     await flutterLocalNotificationsPlugin.show(
         0, titleNotification, titleNews, platformChannelSpecifics,

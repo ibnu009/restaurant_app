@@ -1,4 +1,4 @@
-import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:restaurant_app/utils/background_service.dart';
 import 'package:restaurant_app/utils/date_time_helper.dart';
@@ -10,7 +10,10 @@ class NotificationProvider extends ChangeNotifier {
   Future<bool> scheduleRestaurant(bool value) async {
     _isScheduled = value;
     if (_isScheduled) {
+      print("Scheduled");
       notifyListeners();
+
+
       return await AndroidAlarmManager.periodic(
         Duration(hours: 24),
         1,
@@ -20,6 +23,7 @@ class NotificationProvider extends ChangeNotifier {
         wakeup: true,
       );
     } else {
+      print("NonActivated");
       notifyListeners();
       return await AndroidAlarmManager.cancel(1);
     }
